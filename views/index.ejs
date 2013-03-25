@@ -3,9 +3,100 @@
   <head>
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src='http://d3js.org/d3.v2.min.js'></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+
+    	$(function() {
+
+		  var width = $(document).width(),
+		      height = $(document).height(),
+		      minArea = 1;
+
+		  var svg = d3.select("#map").append("svg")
+		      .attr("width", width)
+		      .attr("height", height);
+
+		  var area = d3.select("#area");
+
+		  
+
+		  //var shape = svg.append("path");
+
+		  var projection = d3.geo.mercator()
+		    .scale(1020000)
+		    .translate([1428548-1149753+196+68047+200,476351-383276+15+22705+200]);
+
+		  var path = d3.geo.path()
+		      .projection(projection);
+
+		  d3.json("/data/neighborhoods.json", function(data) {
+
+		  	var g = svg.append("g");
+		  	console.log(data);
+
+		    //var geography = simplify.project(data);
+
+		    //d3.select("#map h1").remove();
+		    for (var i = 0; i < data.features.length; i++) {
+		    	redraw(data.features[i]);
+		    };
+		    
+
+		    // area.on("change", function () {
+		    //   minArea = area.node().value;
+		    //   redraw();
+		    // });
+
+		    function redraw(feature) {
+		      svg.append("path").attr({
+		      	"d": path(feature),
+		      	"fill": "rgb(161, 217, 155)",
+		      	"stroke": "#ff0000"
+		      });
+		    }
+
+		  });
+
+		  d3.json("/data/freeways.json", function(data) {
+
+		  	var g = svg.append("g");
+		  	console.log(data);
+
+		    //var geography = simplify.project(data);
+
+		    //d3.select("#map h1").remove();
+		    for (var i = 0; i < data.features.length; i++) {
+		    	redraw(data.features[i]);
+		    };
+		    
+
+		    // area.on("change", function () {
+		    //   minArea = area.node().value;
+		    //   redraw();
+		    // });
+
+		    function redraw(feature) {
+		      svg.append("path").attr({
+		      	"d": path(feature),
+		      	"fill": "none",
+		      	"stroke": "#000"
+		      });
+		    }
+
+		  });
+
+		});
+
+
+
+
+    </script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+
+    <div id="map" style="position: absolute; top: 0; left: 0"></div>
+
   </body>
 </html>
