@@ -8,6 +8,9 @@
   "dependencies": {
     "express": "3.1.0",
     "ejs": "*",
-    "less-middleware": "*"
+    "less-middleware": "*",
+    "xml-stream": "*",
+    "xml2js": "*",
+    "socket.io": "*"
   }
 }

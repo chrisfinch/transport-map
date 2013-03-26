@@ -3,11 +3,13 @@
  * Module dependencies.
  */
 
-var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path');
+var express = require('express'),
+  routes = require('./routes'),
+  user = require('./routes/user'),
+  http = require('http'),
+  path = require('path'),
+  transportApi = require('./transportApi'),
+  io = require("socket.io");
 
 var app = express();
 
@@ -31,6 +33,22 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/users', user.list);
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app);
+
+// Create a new instance of socket.IO
+var socketIo = io.listen(server);
+
+// socketIo.configure(function () {
+//   socketIo.set("transports", ["xhr-polling"]);
+//   socketIo.set("polling duration", 10);
+//   socketIo.set('log level', 1);
+// });
+
+server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
+
+socketIo.sockets.on('connection', function (socket) {
+  transportApi.getVehicles(socket);
+});
+
