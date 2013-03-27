@@ -1,5 +1,4 @@
 var http = require('http'),
-    XmlStream = require('xml-stream'),
     xml2js = require('xml2js').parseString,
     baseURL = "http://webservices.nextbus.com/service/publicXMLFeed?",
     agency = 'sf-muni';
@@ -12,22 +11,30 @@ exports.getVehicles = function (socket) {
 
 exports.processRouteLocations = function (data) {
   var that = this;
-  //console.log(data);
-  that.socket.emit("vehicle", data);
+  if (data.vehicles.vehicle) {
+    for (var i = 0; i < data.vehicles.vehicle.length; i++) {
+      that.socket.emit("vehicle", data.vehicles.vehicle[i]['$']);
+    }
+  }
 };
 
 exports.getLocations = function (route) {
   var that = this;
-  http.get(baseURL+"command=vehicleLocations&a="+agency+"&r="+route['$'].tag+"&t=0", function (response) {
-    response.setEncoding('utf8');
-    var buffer = "";
-    response.on("data", function (chunk) { buffer+=chunk; });
-    response.on("end", function () {
-      xml2js(buffer, function (err, result) {
-        that.processRouteLocations({route: route['$'], vehicles: result.body});
+  (function (route) {
+    setInterval(function () {
+      http.get(baseURL+"command=vehicleLocations&a="+agency+"&r="+route['$'].tag+"&t=0", function (response) {
+        response.setEncoding('utf8');
+        var buffer = "";
+        response.on("data", function (chunk) { buffer+=chunk; });
+        response.on("end", function () {
+          xml2js(buffer, function (err, result) {
+            that.processRouteLocations({route: route['$'], vehicles: result.body});
+          });
+        });
       });
-    });
-  });
+    }, 15000);
+  })(route);
+
 };
 
 exports.getRoutes = function () {

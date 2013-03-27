@@ -5,6 +5,17 @@ body {
 a {
   color: #00B7FF;
 }
+#map {
+  background-color: #dedede;
+}
+.vehicles circle {
+  fill: #A1D99B;
+  stroke: #31A354;
+  stroke-width: 1px;
+}
+.vehicles .label {
+  background-color: #fff;
+}
 .ca {
   z-index: 0;
 }
@@ -16,27 +27,29 @@ a {
   z-index: 1;
 }
 .neighborhoods path {
-  fill: #ddd;
-  stroke: #ff0000;
+  fill: #08519c;
+  stroke: #ffffff;
+  stroke-width: 2px;
 }
 .freeways {
   z-index: 2;
 }
 .freeways path {
-  stroke: pink;
+  stroke: #DEEBF7;
   fill: none;
 }
 .arteries {
   z-index: 3;
 }
 .arteries path {
-  stroke: #ffff00;
+  stroke: #9ECAE1;
   fill: none;
+  strok-width: 2px;
 }
 .streets {
   z-index: 4;
 }
 .streets path {
-  stroke: #666;
+  stroke: #3182BD;
   fill: none;
 }

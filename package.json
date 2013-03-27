@@ -9,7 +9,6 @@
     "express": "3.1.0",
     "ejs": "*",
     "less-middleware": "*",
-    "xml-stream": "*",
     "xml2js": "*",
     "socket.io": "*"
   }
