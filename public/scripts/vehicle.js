@@ -1,3 +1,6 @@
+/**
+ * This is the vehicle module that provides vehicle instances with various helper functions for creating, updating and manipulating themselves.
+ */
 define(function () {
   var vehicle = function (data, parent, projection, color) {
 
@@ -7,6 +10,10 @@ define(function () {
     that.node = null;
     that.el = null;
 
+    /**
+     * Helper functions for getting the correct coordinates for ploting the position from the lat/long
+     * @type {Object}
+     */
     helpers = {
       getX: function (d) {
         return projection([d.lon, d.lat])[0];
@@ -16,6 +23,9 @@ define(function () {
       }
     };
 
+    /**
+     * Create this vehicle on the map with a point for its position and two elements that make up the vehicles label.
+     */
     that.create = function () {
       that.node = parent.append("g")
                     .datum(data);
@@ -48,6 +58,10 @@ define(function () {
                   .style("display", "none");
     };
 
+    /**
+     * Update this vehicles position on the map along with its label
+     * @param  {Object} data The new data with the new position
+     */
     that.update = function (data) {
       that.data = data;
       that.node.datum(data)
@@ -77,14 +91,23 @@ define(function () {
         });
     };
 
-    that.hideLabel = function () {
-      $(that.label[0]).add($(that.text[0])).fadeOut();
-    };
-
+    /**
+     * Show this vehicles label
+     */
     that.showLabel = function () {
-      if (that.el) $(that.label[0]).add($(that.text[0])).fadeIn();
+      if (that.el) $(that.label[0]).add($(that.text[0])).show();
     };
 
+    /**
+     * Hide this vehicles label
+     */
+    that.hideLabel = function () {
+      $(that.label[0]).add($(that.text[0])).hide();
+    };
+
+    /**
+     * Remove this vehicle from the map and destory its SVG DOM element
+     */
     that.destroy = function () {
       if (that.el) that.el.remove();
       that.hideLabel();

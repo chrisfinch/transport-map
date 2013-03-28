@@ -10,6 +10,7 @@ var express = require('express'),
   transportApi = require('./transportApi'),
   io = require("socket.io");
 
+// Fire up express and configure
 var app = express();
 
 app.configure(function(){
@@ -29,8 +30,10 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+// Our one and only route
 app.get('/', routes.index);
 
+// Kick off the server
 var server = http.createServer(app);
 
 // Create a new instance of socket.IO
@@ -42,10 +45,12 @@ var socketIo = io.listen(server);
 //   socketIo.set('log level', 1);
 // });
 
+// Start listening for incoming connections
 server.listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
+// Start listening for socket events to fire off to our transportApi instance
 socketIo.sockets.on('connection', function (socket) {
   transportApi.setup(socket);
   socket.on("findRoutes", function () {

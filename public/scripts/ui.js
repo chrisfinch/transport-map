@@ -1,15 +1,33 @@
+/**
+ * This is the UI module that handles all DOM manipulation and event binding that is not directly part of the map.
+ */
 define(["map"], function (map) {
   return (function () {
 
     $controls = $(".controls");
     $notify = $(".notify");
-    $routes = $("#routes");
-    $list = $(".displayedRoutes");
+    $routes = $controls.find("#routes");
+    $list = $controls.find(".displayedRoutes");
+    $labels = $controls.find(".labels");
+    $clear = $controls.find(".clear");
 
     var build = function () {
       socket.emit("findRoutes");
       socket.on("routes", function (routes) {
         addRoutes(routes);
+      });
+    };
+
+    var bind = function () {
+      $labels.on("click", function (event) {
+        toggleLabels($(this));
+      });
+      $routes.on("change", function (event) {
+        //map.clearVehicles();
+        addVehicle($(this));
+      });
+      $clear.on("click", function (event) {
+        map.clearAllVehicles();
       });
     };
 
@@ -32,35 +50,33 @@ define(["map"], function (map) {
       }
     };
 
-    var bind = function () {
-      $controls.find(".labels").on("click", function (event) {
-        var vehicles = map.getVehicles();
-        if ($(this).hasClass("on")) {
-          for (var v in vehicles) {
-            vehicles[v].hideLabel();
+    var toggleLabels = function ($el) {
+      var routesHash = map.getRoutesHash();
+      if ($el.hasClass("on")) {
+        for (var o in routesHash) {
+          for (var v in routesHash[o]) {
+            routesHash[o][v].hideLabel();
           }
-          $(this).removeClass("on");
-          notify("Labels off");
-        } else {
-          for (var w in vehicles) {
-            vehicles[w].showLabel();
-          }
-          $(this).addClass("on");
-          notify("Labels on");
         }
-      });
-      $routes.on("change", function (event) {
-        //map.clearVehicles();
-        addVehicle($(this));
-      });
+        $el.removeClass("on");
+        notify("Labels off");
+      } else {
+        for (var w in routesHash) {
+          for (var x in routesHash[w]) {
+            routesHash[w][x].showLabel();
+          }
+        }
+        $el.addClass("on");
+        notify("Labels on");
+      }
     };
 
     var addVehicle = function ($el) {
-      map.findVehicles($el[0].value);
       var $option = $($el[0].options[$el[0].selectedIndex]);
+      map.findVehicles($el[0].value, $option.data("color"));
       var $icon = $("<span />").addClass("icon").css("backgroundColor", $option.data("color"));
       var $text = $("<span />").html($option.data("title"));
-      var $li = $("<li />").append($icon, $text);
+      var $li = $("<li />").addClass($el[0].value).append($icon, $text);
       $li.appendTo($list);
     };
 
@@ -72,6 +88,7 @@ define(["map"], function (map) {
 
     return {
       init: function () {
+        map.clearAllVehicles(); // Clear out old vehicle feeds on the server incase of refresh
         build();
         bind();
       }

@@ -1,7 +1,10 @@
+/**
+ * This is our map module that handles all logic and functionality for drawing our svg map with d3 and plotting our vehicle positions on it.
+ */
 define(["vehicle"], function (vehicle) {
   return (function () {
 
-    var svg, projection, vehicles, vehiclesMap, path, colors = {};
+    var svg, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {};
 
     var width = parseInt($(document).width(), 10),
     height = parseInt($(document).height(), 10),
@@ -41,13 +44,13 @@ define(["vehicle"], function (vehicle) {
 
     var plotVehicle = function (data) {
       vehicles = vehicles || svg.append("g").attr("class", "vehicles");
-      vehiclesMap = vehiclesMap || {};
-      vehiclesMap[data.id] = vehiclesMap[data.id] || new vehicle(data, vehicles, projection, colors[data.routeTag]);
+      var hash = routesHash[data.routeTag] = routesHash[data.routeTag] || {};
+      hash[data.id] = hash[data.id] || new vehicle(data, vehicles, projection, colors[data.routeTag]);
 
-      if (vehiclesMap[data.id].el === null) {
-        vehiclesMap[data.id].create();
+      if (hash[data.id].el === null) {
+        hash[data.id].create();
       } else {
-        vehiclesMap[data.id].update(data);
+        hash[data.id].update(data);
       }
 
     };
@@ -91,14 +94,16 @@ define(["vehicle"], function (vehicle) {
           getGeoJSON();
         });
       },
-      getVehicles: function () {
-        return vehiclesMap;
+      getRoutesHash: function () {
+        return routesHash;
       },
-      clearVehicles: function () {
+      clearAllVehicles: function () {
         socket.emit("clearVehicles");
         socket.on("vehiclesCleared", function () {
-          for (var v in vehiclesMap) {
-            vehiclesMap[v].destroy();
+          for (var r in routesHash) {
+            for (var v in routesHash[r]) {
+              routesHash[r][v].destroy();
+            }
           }
         });
       },
