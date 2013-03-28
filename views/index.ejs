@@ -6,11 +6,29 @@
 	<script src="/scripts/vendor/jquery-1.8.2.min.js"></script>
 	<script src='/scripts/vendor/d3.v3.min.js'></script>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="/scripts/script.js"></script>
+	<script src='/scripts/vendor/d3.v3.min.js'></script>
+	<script data-main="/scripts/main.js" src="/scripts/vendor/require.js"></script>
 </head>
 <body>
 
 	<div id="map" style="position: absolute; top: 0; left: 0"></div>
+
+	<div class="controls">
+		<div class="control">
+			<button class="labels">Toggle Labels</button>
+		</div>
+		<div class="control">
+			<label for="routes">Add route:</label>
+			<select name="routes" id="routes">
+				<option value="all">All routes</option>
+			</select>
+		</div>
+		<div class="control">
+			<ul class="displayedRoutes"></ul>
+		</div>
+	</div>
+
+	<h1 class="notify"></h1>
 
 </body>
 </html>

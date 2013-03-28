@@ -5,7 +5,6 @@
 
 var express = require('express'),
   routes = require('./routes'),
-  user = require('./routes/user'),
   http = require('http'),
   path = require('path'),
   transportApi = require('./transportApi'),
@@ -31,7 +30,6 @@ app.configure('development', function(){
 });
 
 app.get('/', routes.index);
-app.get('/users', user.list);
 
 var server = http.createServer(app);
 
@@ -49,6 +47,15 @@ server.listen(app.get('port'), function(){
 });
 
 socketIo.sockets.on('connection', function (socket) {
-  transportApi.getVehicles(socket);
+  transportApi.setup(socket);
+  socket.on("findRoutes", function () {
+    transportApi.getRoutes();
+  });
+  socket.on("findVehicles", function (data) {
+    transportApi.getVehicles(data.routeTag);
+  });
+  socket.on("clearVehicles", function () {
+    transportApi.clearVehicles();
+  });
 });
 

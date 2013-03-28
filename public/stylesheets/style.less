@@ -1,6 +1,6 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 a {
@@ -9,16 +9,104 @@ a {
 
 #map {
   background-color: #dedede;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.notify {
+  display: block;
+  position: absolute;
+  top: 35%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  margin: 0;
+  width: 100%;
+  font-size: 60px;
+  line-height: 60px;
+  height: 60px;
+  text-align: center;
+  font-weight: bold;
+  opacity: 1;
+  &.pop {
+    -moz-animation-name: pop;
+    -moz-animation-timing-function: linear-in-out;
+    -moz-animation-iteration-count: 1;
+    -moz-animation-duration: 0.5s;
+    -moz-animation-direction: normal;
+    -webkit-animation-name: pop;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: 1;
+    -webkit-animation-duration: 0.5s;
+    -webkit-animation-direction: normal;
+  }
+}
+
+.controls {
+  height: 56px;
+  padding: 12px;
+  background-color: #fff;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  -moz-box-shadow: 0px 3px 12px 2px rgba(0,0,0,0.9);
+  -webkit-box-shadow: 0px 3px 12px 2px rgba(0,0,0,0.9);
+  box-shadow: 0px 3px 12px 2px rgba(0,0,0,0.9);
+  .control {
+    float: left;
+    height: 56px;
+    margin: 0 12px 0 0;
+
+    .displayedRoutes {
+      display: block;
+      height: 56px;
+      width: 480px; // 3 columns...
+      margin: 0;
+      padding: 0;
+      li {
+        display: block;
+        float: left;
+        height: 14px;
+        width: 160px;
+        line-height: 14px;
+        font-size: 12px;
+        margin: 0 0 2px 0;
+        span {
+          float: left;
+          &.icon {
+            height: 12px;
+            width: 12px;
+            margin: 0 6px 0 0;
+            border: 1px solid #000;
+          }
+        }
+      }
+    }
+
+  }
 }
 
 .vehicles {
   circle {
-    fill: #A1D99B;
-    stroke: #31A354;
+    //fill: #A1D99B;
+    //stroke: #31A354;
+    stroke: #fff;
     stroke-width: 1px;
   }
   .label {
-    background-color: #fff;
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 1px;
+  }
+  text {
+    font-size: 10px;
+    height: 20px;
   }
 }
 
@@ -31,32 +119,54 @@ a {
 }
 
 .neighborhoods {
-  z-index: 1;
   path {
     fill: rgb(8,81,156);
+    fill: #dedede;
     stroke: #ffffff;
     stroke-width: 2px;
   }
 }
-.freeways {
-  z-index: 2;
+.streets {
   path {
-    stroke: #DEEBF7;
+    stroke: #aaa;
     fill: none;
   }
 }
 .arteries {
-  z-index: 3;
   path {
-    stroke: #9ECAE1;
+    stroke: #a0a0a0;
     fill: none;
     strok-width: 2px;
   }
 }
-.streets {
-  z-index: 4;
+.freeways {
   path {
-    stroke: #3182BD;
+    stroke: #707070;
     fill: none;
+  }
+}
+
+/* Animations
+========================================================== */
+
+// Pop (notification text)
+
+@-moz-keyframes pop {
+  0% {
+    z-index: 4;
+  }
+  100% {
+    font-size: 200px;
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes pop {
+  0% {
+    z-index: 4;
+  }
+  100% {
+    font-size: 200px;
+    opacity: 0;
   }
 }
