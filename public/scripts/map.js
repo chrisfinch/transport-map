@@ -10,8 +10,12 @@ define(["vehicle"], function (vehicle) {
     height = parseInt($(document).height(), 10),
     minArea = 1;
 
-    var getGeoJSON = function () {
-      var urls = ['neighborhoods', 'streets', 'arteries', 'freeways'];
+    /**
+     * Fetch an array of JSON files from the server with a single callback
+     * @param  {array}   urls     Files to GET
+     * @param  {Function} callback Callback function accepting the returned data and the list of urls
+     */
+    var getJSONs = function (urls, callback) {
       var jxhr = [];
       var json = [];
       $.each(urls, function (i, url) {
@@ -22,11 +26,11 @@ define(["vehicle"], function (vehicle) {
           );
       });
       $.when.apply($, jxhr).done(function() {
-        drawGeoJSON(json, urls);
+        callback(json, urls);
       });
     };
 
-    var drawGeoJSON = function (json, urls) { // Ensure that SVG layers are drawn in the correct order
+    var drawMapGeoJSON = function (json, urls) { // Ensure that SVG layers are drawn in the correct order
       for (var i = 0; i < urls.length; i++) {
         var data = json.filter(function (e) {
           return e.type === urls[i];
@@ -61,6 +65,35 @@ define(["vehicle"], function (vehicle) {
       }
     };
 
+    var drawRefGeoJSON = function (json, urls) {
+      var prj = d3.geo.albers().scale(1).translate([0,0]);
+      var pth = d3.geo.path().projection(prj);
+      var ref = d3.select("#ref").append('svg').append("g").attr("class", "ref");
+
+      var w = $("#ref").width();
+      var h = $("#ref").height();
+
+      var sf_data = json.filter(function (e) {
+        return e.type === 'sf_basic';
+      })[0];
+      var b = pth.bounds(sf_data.data),
+      s = 0.018*(h/(b[1][1] - b[0][1])),
+      t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
+      prj.scale(s).translate(t);
+
+      for (var i = 0; i < urls.length; i++) {
+        var data = json.filter(function (e) {
+          return e.type === urls[i];
+        });
+        ref.append("path")
+        .datum(data[0].data)
+        .attr({
+          "d": pth,
+          "class": data[0].type
+        });
+      }
+    };
+
     var plotVehicle = function (data) {
       vehicles = vehicles || svg.append("g").attr("class", "vehicles");
       var hash = routesHash[data.routeTag] = routesHash[data.routeTag] || {};
@@ -87,41 +120,9 @@ define(["vehicle"], function (vehicle) {
           .attr("height", height);
         projection = d3.geo.albers().scale(1).translate([0,0]);
         path = d3.geo.path().projection(projection);
-        this.draw();
+        getJSONs(['california_basic', 'sf_basic'], drawRefGeoJSON);
+        getJSONs(['neighborhoods', 'streets', 'arteries', 'freeways'], drawMapGeoJSON);
         awaitVehicles();
-      },
-      draw: function () {
-        $.getJSON("/data/california_basic.json", function (data) {
-          //var sf_county = data.features[1545];
-          // Compute the bounds of a feature of interest, then derive scale & translate.
-          // var b = path.bounds(sf_county),
-          // s = (0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][0]) / height)),
-          // t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-          // projection.scale(s).translate(t);
-          var prj = d3.geo.albers().scale(1).translate([0,0]);
-          var pth = d3.geo.path().projection(prj);
-          var ca = d3.select("#ref").append('svg').append("g").attr("class", "ca");
-
-          var w = $("#ref").width();
-          var h = $("#ref").height();
-
-          var b = pth.bounds(data),
-          s = 0.95*(h/(b[1][1] - b[0][1])),
-          t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
-          prj.scale(s).translate(t);
-
-          ca.append("path")
-          .datum(data)
-          .attr({
-            "d": pth,
-            "class": function (d) {
-              return "class";
-            }
-          });
-
-
-        });
-        getGeoJSON();        
       },
       getRoutesHash: function () {
         return routesHash;

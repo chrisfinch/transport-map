@@ -18,9 +18,10 @@ body {
   top: -1px;
   right: -1px;
   z-index: 3;
-  height: 300px;
-  width: 200px;
+  height: 400px;
+  width: 250px;
   border: 1px solid #aaa;
+  background-color: #eee;
 }
 /* Controls & Chrome
 ========================================================== */
@@ -152,6 +153,14 @@ form.controls .control-group .displayedRoutes li span.icon {
 .freeways path {
   stroke: #707070;
   fill: none;
+}
+#ref .ref path {
+  stroke: #fff;
+  fill: #e0e0e0;
+}
+#ref .ref path.sf_basic {
+  fill: #00ff00;
+  stroke: #0e0e0e;
 }
 /* Animations
 ========================================================== */
