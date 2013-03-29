@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title><%= title %></title>
+	<link rel='stylesheet' href='/stylesheets/bootstrap.min.css' />
 	<link rel='stylesheet' href='/stylesheets/style.css' />
 	<script src="/scripts/vendor/jquery-1.8.2.min.js"></script>
 	<script src='/scripts/vendor/d3.v3.min.js'></script>
@@ -11,23 +12,29 @@
 </head>
 <body>
 
-	<div id="map" style="position: absolute; top: 0; left: 0"></div>
+	<div id="map"></div>
 
-	<div class="controls">
-		<div class="control">
-			<button class="labels">Toggle Labels</button>
+	<div id="ref"></div>
+
+	<div class="ctrl-toggle">
+		<button class="btn btn-primary">Controls</button>
+	</div>
+
+	<form class="controls">
+		<div class="control-group">
+			<button class="labels btn">Toggle Labels</button>
 		</div>
-		<div class="control">
+		<div class="control-group">
 			<label for="routes">Add route:</label>
 			<select name="routes" id="routes">
 				<option value="all">All routes</option>
 			</select>
-      <button class="clear">Clear Routes</button>
+      <button class="clear btn btn-warning">Clear Routes</button>
 		</div>
-		<div class="control">
+		<div class="control-group">
 			<ul class="displayedRoutes"></ul>
 		</div>
-	</div>
+	</form>
 
 	<h1 class="notify"></h1>
 

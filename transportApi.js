@@ -30,7 +30,7 @@ var getResource = function (url, callback) {
 exports.setup = function (socket) {
   var that = this;
   that.socket = socket;
-  that.intervals = {};
+  that.intervals = that.intervals || {};
 };
 
 /**

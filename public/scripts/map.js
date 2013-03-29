@@ -31,6 +31,25 @@ define(["vehicle"], function (vehicle) {
         var data = json.filter(function (e) {
           return e.type === urls[i];
         });
+
+        /**
+         * If the data is for the neigborhoods SVG then use that to center and scale the projection.
+         */
+        if (urls[i] === 'neighborhoods') {
+          /**
+           * The correct scale for a projection can be worked out by applying the following formula with bounding box 'b':
+           * Math.max(cavasWidth/(b[1][0] - b[0][0]), canvasHeight/(b[1][1] - b[0][0]))
+           * This works by comparing the dimensions of the bounding box to the dimensions of the canvas.
+           *
+           * The translation for the canvas works in a simlar way, first multiplying the bounding box by the scale and 
+           * then using the canvas dimensions to position it.
+           */
+          var b = path.bounds(data[0].data),
+          s = 0.95*(height/(b[1][1] - b[0][1])),
+          t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+          projection.scale(s).translate(t);
+        }
+
         var g = svg.append("g").attr("class", data[0].type);
         g.selectAll("path")
         .data(data[0].data.features)
@@ -39,8 +58,8 @@ define(["vehicle"], function (vehicle) {
         .attr({
           "d": path
         });
-      } // !for
-    }; // !draw
+      }
+    };
 
     var plotVehicle = function (data) {
       vehicles = vehicles || svg.append("g").attr("class", "vehicles");
@@ -72,27 +91,37 @@ define(["vehicle"], function (vehicle) {
         awaitVehicles();
       },
       draw: function () {
-        $.getJSON("/data/us_counties.json", function (data) {
-          var sf_county = data.features[1545];
+        $.getJSON("/data/california_basic.json", function (data) {
+          //var sf_county = data.features[1545];
           // Compute the bounds of a feature of interest, then derive scale & translate.
-          var b = path.bounds(sf_county),
-          s = (0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][0]) / height))*150,
-          t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-          projection.scale(s).translate(t);
+          // var b = path.bounds(sf_county),
+          // s = (0.95 / Math.max((b[1][0] - b[0][0]) / width, (b[1][1] - b[0][0]) / height)),
+          // t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+          // projection.scale(s).translate(t);
+          var prj = d3.geo.albers().scale(1).translate([0,0]);
+          var pth = d3.geo.path().projection(prj);
+          var ca = d3.select("#ref").append('svg').append("g").attr("class", "ca");
 
-          var ca = svg.append("g").attr("class", "ca");
+          var w = $("#ref").width();
+          var h = $("#ref").height();
+
+          var b = pth.bounds(data),
+          s = 0.95*(h/(b[1][1] - b[0][1])),
+          t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
+          prj.scale(s).translate(t);
 
           ca.append("path")
           .datum(data)
           .attr({
-            "d": path,
+            "d": pth,
             "class": function (d) {
               return "class";
             }
           });
 
-          getGeoJSON();
+
         });
+        getGeoJSON();        
       },
       getRoutesHash: function () {
         return routesHash;

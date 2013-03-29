@@ -10,6 +10,7 @@ define(["map"], function (map) {
     $list = $controls.find(".displayedRoutes");
     $labels = $controls.find(".labels");
     $clear = $controls.find(".clear");
+    $ctrl_toggle = $(".ctrl-toggle .btn");
 
     var build = function () {
       socket.emit("findRoutes");
@@ -19,15 +20,26 @@ define(["map"], function (map) {
     };
 
     var bind = function () {
+      $ctrl_toggle.on("click", function (event) {
+        event.preventDefault();
+        if ($controls.is(".open")) $controls.removeClass("open");
+        else $controls.addClass("open");
+      });
       $labels.on("click", function (event) {
+        event.preventDefault();
         toggleLabels($(this));
       });
       $routes.on("change", function (event) {
-        //map.clearVehicles();
+        event.preventDefault();
         addVehicle($(this));
       });
       $clear.on("click", function (event) {
+        event.preventDefault();
         map.clearAllVehicles();
+        socket.on("vehiclesCleared", function () {
+          emptyVehicleList();
+          notify("Routes cleared");
+        });
       });
     };
 
@@ -84,6 +96,10 @@ define(["map"], function (map) {
       $notify.html(text).addClass("pop").on("webkitAnimationEnd oanimationend msAnimationEnd animationend", function () {
         $notify.removeClass("pop");
       });
+    };
+
+    var emptyVehicleList = function () {
+      $list.empty();
     };
 
     return {
