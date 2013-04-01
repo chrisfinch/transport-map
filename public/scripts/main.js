@@ -2,7 +2,7 @@ require(["map", "vehicle", "ui"], function (map, vehicle, ui) {
   $(function() {
 
     // Initialize our websocket..
-    window.socket = io.connect('http://localhost');
+    window.socket = io.connect(window.location.hostname);
 
     // Build our map from geojson
     map.build("#map");
