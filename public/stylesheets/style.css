@@ -13,6 +13,14 @@ body {
   overflow: hidden;
   z-index: 2;
 }
+#map #load {
+  width: 128px;
+  height: 128px;
+  margin: -64px 0 0 -64px;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+}
 #ref {
   position: fixed;
   top: -1px;
@@ -103,6 +111,7 @@ form.controls .control-group .displayedRoutes li {
   line-height: 14px;
   font-size: 12px;
   margin: 0 0 2px 0;
+  cursor: pointer;
 }
 form.controls .control-group .displayedRoutes li span {
   float: left;
@@ -112,6 +121,22 @@ form.controls .control-group .displayedRoutes li span.icon {
   width: 12px;
   margin: 0 6px 0 0;
   border: 1px solid #000;
+}
+form.controls .control-group .displayedRoutes li:hover .icon {
+  background-color: #fff !important;
+  position: relative;
+}
+form.controls .control-group .displayedRoutes li:hover .icon:before {
+  content: "X";
+  font-size: 13px;
+  text-align: center;
+  line-height: 13px;
+  height: 13px;
+  width: 12px;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 /* SVG Styles
 ========================================================== */

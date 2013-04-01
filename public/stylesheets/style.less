@@ -14,6 +14,14 @@ body {
   bottom: 0;
   overflow: hidden;
   z-index: 2;
+  #load {
+    width: 128px;
+    height: 128px;
+    margin: -64px 0 0 -64px;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+  }
 }
 
 #ref {
@@ -109,6 +117,7 @@ form.controls {
         line-height: 14px;
         font-size: 12px;
         margin: 0 0 2px 0;
+        cursor: pointer;
         span {
           float: left;
           &.icon {
@@ -118,6 +127,23 @@ form.controls {
             border: 1px solid #000;
           }
         }
+        &:hover .icon {
+          background-color: #fff !important;
+          position: relative;
+          &:before {
+            content: "X";
+            font-size: 13px;
+            text-align: center;
+            line-height: 13px;
+            height: 13px;
+            width: 12px;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+          }
+        }
+
       }
     }
 

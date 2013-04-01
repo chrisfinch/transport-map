@@ -28,6 +28,7 @@ var getResource = function (url, callback) {
  * @param  {Object} socket Socket.io object
  */
 exports.setup = function (socket) {
+  console.log("transportApi::setup");
   var that = this;
   that.socket = socket;
   that.intervals = that.intervals || {};
@@ -38,6 +39,7 @@ exports.setup = function (socket) {
  * @param  {Object} socket Socket.io object
  */
 exports.getVehicles = function (routeTag) {
+  console.log("transportApi::getVehicles::"+routeTag);
   var that = this;
   if (routeTag === "all") {
     for (var i = 0; i < that.routes.length; i++) {
@@ -64,10 +66,22 @@ exports.clearVehicles = function () {
 };
 
 /**
+ * Clear the timeout for a specific route
+ * @param  {String} routeTag The routeTag of the route to be cleared
+ */
+exports.clearRoute = function (routeTag) {
+  console.log("transportApi::clearRoute::"+routeTag);
+  var that = this;
+  clearInterval(that.intervals[routeTag]);
+  that.socket.emit("routeCleared", {routeTag: routeTag});
+};
+
+/**
  * Sets an interval the gets the locations of all vehicles for a given route every 15 seconds and emits that data to the client
  * @param  {Object} route
  */
 exports.getLocations = function (route) {
+  console.log("transportApi::getLocations::"+route);
   var that = this;
   (function (route) {
     var f = function () {

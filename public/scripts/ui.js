@@ -89,7 +89,9 @@ define(["map"], function (map) {
       var $icon = $("<span />").addClass("icon").css("backgroundColor", $option.data("color"));
       var $text = $("<span />").html($option.data("title"));
       var $li = $("<li />").addClass($el[0].value).append($icon, $text);
-      $li.appendTo($list);
+      $li.appendTo($list).find(".icon").on("click", function (event) {
+        map.clearRoute($(this).parent().attr("class"));
+      });
     };
 
     var notify = function (text) {

@@ -4,7 +4,7 @@
 define(["vehicle"], function (vehicle) {
   return (function () {
 
-    var svg, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {};
+    var svg, mapG, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {}, PATHS = [], $load = $("#load");
 
     var width = parseInt($(document).width(), 10),
     height = parseInt($(document).height(), 10),
@@ -30,7 +30,41 @@ define(["vehicle"], function (vehicle) {
       });
     };
 
+    /**
+     * Scale and translate a projection based on the bounding box of some data and the path for displaying it.
+     * @param  {Int}    width      Dimensions of the container to scale to
+     * @param  {Int}    height     Dimensions of the container to scale to
+     * @param  {Int}    scale      Multiplier for the calculated scale to fine tune projections
+     * @param  {Object} data       GeoJSON data for bounding box
+     * @param  {Object} path       The path based on the projection
+     * @param  {Object} projection The projection to scale and translate
+     * @return {Object}            The scaled projection
+     */
+    var scaleToData = function (width, height, scale, data, path, projection) {
+      /**
+       * The correct scale for a projection can be worked out by applying the following formula with bounding box 'b':
+       * Math.max(cavasWidth/(b[1][0] - b[0][0]), canvasHeight/(b[1][1] - b[0][0]))
+       * This works by comparing the dimensions of the bounding box to the dimensions of the canvas.
+       *
+       * The translation for the canvas works in a simlar way, first multiplying the bounding box by the scale and 
+       * then using the canvas dimensions to position it.
+       */
+      var b = path.bounds(data);
+
+      var s = scale*(height/(b[1][1] - b[0][1]));
+
+      var t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
+
+      projection.scale(s).translate(t);
+
+      return projection;
+    };
+
     var drawMapGeoJSON = function (json, urls) { // Ensure that SVG layers are drawn in the correct order
+      this.mapJSON = json;
+      this.mapURLS = urls;
+      mapG = svg.append("g").attr("class", "map");
+      $load.remove();
       for (var i = 0; i < urls.length; i++) {
         var data = json.filter(function (e) {
           return e.type === urls[i];
@@ -40,21 +74,10 @@ define(["vehicle"], function (vehicle) {
          * If the data is for the neigborhoods SVG then use that to center and scale the projection.
          */
         if (urls[i] === 'neighborhoods') {
-          /**
-           * The correct scale for a projection can be worked out by applying the following formula with bounding box 'b':
-           * Math.max(cavasWidth/(b[1][0] - b[0][0]), canvasHeight/(b[1][1] - b[0][0]))
-           * This works by comparing the dimensions of the bounding box to the dimensions of the canvas.
-           *
-           * The translation for the canvas works in a simlar way, first multiplying the bounding box by the scale and 
-           * then using the canvas dimensions to position it.
-           */
-          var b = path.bounds(data[0].data),
-          s = 0.95*(height/(b[1][1] - b[0][1])),
-          t = [(width - s * (b[1][0] + b[0][0])) / 2, (height - s * (b[1][1] + b[0][1])) / 2];
-          projection.scale(s).translate(t);
+          projection = scaleToData(width, height, 0.95, data[0].data, path, projection);
         }
 
-        var g = svg.append("g").attr("class", data[0].type);
+        var g = mapG.append("g").attr("class", data[0].type);
         g.selectAll("path")
         .data(data[0].data.features)
         .enter()
@@ -62,6 +85,7 @@ define(["vehicle"], function (vehicle) {
         .attr({
           "d": path
         });
+        PATHS.push(g);
       }
     };
 
@@ -76,10 +100,7 @@ define(["vehicle"], function (vehicle) {
       var sf_data = json.filter(function (e) {
         return e.type === 'sf_basic';
       })[0];
-      var b = pth.bounds(sf_data.data),
-      s = 0.018*(h/(b[1][1] - b[0][1])),
-      t = [(w - s * (b[1][0] + b[0][0])) / 2, (h - s * (b[1][1] + b[0][1])) / 2];
-      prj.scale(s).translate(t);
+      prj = scaleToData(w, h, 0.018, sf_data.data, pth, prj);
 
       for (var i = 0; i < urls.length; i++) {
         var data = json.filter(function (e) {
@@ -114,6 +135,7 @@ define(["vehicle"], function (vehicle) {
     };
 
     return {
+
       build: function (id) {
         svg = d3.select(id).append("svg")
           .attr("width", width)
@@ -124,9 +146,34 @@ define(["vehicle"], function (vehicle) {
         getJSONs(['neighborhoods', 'streets', 'arteries', 'freeways'], drawMapGeoJSON);
         awaitVehicles();
       },
+
+      redraw: function () {
+        var w = parseInt($(document).width(), 10);
+        var h = parseInt($(document).height(), 10);
+        var scaleFactor = Math.max((w/width), (h/height));
+        svg.attr({
+          "width": w,
+          "height": h
+        });
+        mapG.attr({
+          "transform": "scale(" + scaleFactor + ")",
+          "x": (w/2)*-1
+        });
+      },
+
       getRoutesHash: function () {
         return routesHash;
       },
+
+      clearRoute: function (routeTag) {
+        socket.emit("clearRoute", {routeTag: routeTag});
+        socket.on("routeCleared", function (data) {
+          for (var v in routesHash[routeTag]) {
+            routesHash[routeTag][v].destroy();
+          }
+        });
+      },
+
       clearAllVehicles: function () {
         socket.emit("clearVehicles");
         socket.on("vehiclesCleared", function () {
@@ -137,10 +184,12 @@ define(["vehicle"], function (vehicle) {
           }
         });
       },
+
       findVehicles: function (routeTag, color) {
         colors[routeTag] = color;
         socket.emit("findVehicles", {routeTag: routeTag});
       }
+
     }; // map
   })();
 });

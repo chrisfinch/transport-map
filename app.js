@@ -63,5 +63,8 @@ socketIo.sockets.on('connection', function (socket) {
   socket.on("clearVehicles", function () {
     transportApi.clearVehicles();
   });
+  socket.on("clearRoute", function (data) {
+    transportApi.clearRoute(data.routeTag);
+  });
 });
 
