@@ -39,11 +39,12 @@ var server = http.createServer(app);
 // Create a new instance of socket.IO
 var socketIo = io.listen(server);
 
-// socketIo.configure(function () {
-//   socketIo.set("transports", ["xhr-polling"]);
-//   socketIo.set("polling duration", 10);
-//   socketIo.set('log level', 1);
-// });
+// Heroku doesn't support websockets :-(
+socketIo.configure(function () {
+  socketIo.set("transports", ["xhr-polling"]);
+  socketIo.set("polling duration", 10);
+  socketIo.set('log level', 1);
+});
 
 // Start listening for incoming connections
 server.listen(app.get('port'), function(){

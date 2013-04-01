@@ -27,6 +27,7 @@ define(function () {
      * Create this vehicle on the map with a point for its position and two elements that make up the vehicles label.
      */
     that.create = function () {
+      console.log(that.data);
       that.node = parent.append("g")
                     .datum(data);
       that.el = that.node.append("circle")
