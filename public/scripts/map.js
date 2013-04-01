@@ -165,12 +165,13 @@ define(["vehicle"], function (vehicle) {
         return routesHash;
       },
 
-      clearRoute: function (routeTag) {
+      clearRoute: function (routeTag, callback) {
         socket.emit("clearRoute", {routeTag: routeTag});
         socket.on("routeCleared", function (data) {
           for (var v in routesHash[routeTag]) {
             routesHash[routeTag][v].destroy();
           }
+          callback();
         });
       },
 

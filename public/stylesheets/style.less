@@ -112,11 +112,11 @@ form.controls {
       li {
         display: block;
         float: left;
-        height: 14px;
+        //height: 16px;
         width: 180px;
-        line-height: 14px;
-        font-size: 12px;
-        margin: 0 0 2px 0;
+        line-height: 16px;
+        font-size: 14px;
+        margin: 0 0 4px 0;
         cursor: pointer;
         span {
           float: left;
@@ -125,6 +125,16 @@ form.controls {
             width: 12px;
             margin: 0 6px 0 0;
             border: 1px solid #000;
+            -webkit-border-radius: 3px;
+               -moz-border-radius: 3px;
+                    border-radius: 3px;
+          }
+          &.amount {
+            float: right;     
+          }
+          &.name {
+            width: 126px;
+            overflow: hidden;
           }
         }
         &:hover .icon {
@@ -162,7 +172,7 @@ form.controls {
   }
   .label {
     fill: #fff;
-    stroke: #000;
+    stroke: #aaa;
     stroke-width: 1px;
   }
   text {

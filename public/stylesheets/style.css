@@ -106,11 +106,10 @@ form.controls .control-group .displayedRoutes {
 form.controls .control-group .displayedRoutes li {
   display: block;
   float: left;
-  height: 14px;
   width: 180px;
-  line-height: 14px;
-  font-size: 12px;
-  margin: 0 0 2px 0;
+  line-height: 16px;
+  font-size: 14px;
+  margin: 0 0 4px 0;
   cursor: pointer;
 }
 form.controls .control-group .displayedRoutes li span {
@@ -121,6 +120,16 @@ form.controls .control-group .displayedRoutes li span.icon {
   width: 12px;
   margin: 0 6px 0 0;
   border: 1px solid #000;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+form.controls .control-group .displayedRoutes li span.amount {
+  float: right;
+}
+form.controls .control-group .displayedRoutes li span.name {
+  width: 126px;
+  overflow: hidden;
 }
 form.controls .control-group .displayedRoutes li:hover .icon {
   background-color: #fff !important;
@@ -146,7 +155,7 @@ form.controls .control-group .displayedRoutes li:hover .icon:before {
 }
 .vehicles .label {
   fill: #fff;
-  stroke: #000;
+  stroke: #aaa;
   stroke-width: 1px;
 }
 .vehicles text {

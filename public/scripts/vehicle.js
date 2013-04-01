@@ -9,6 +9,8 @@ define(function () {
     that.color = color;
     that.node = null;
     that.el = null;
+    that.$route = $(".displayedRoutes").find("."+data.routeTag);
+    that.$amt = that.$route.find(".amount");
 
     /**
      * Helper functions for getting the correct coordinates for ploting the position from the lat/long
@@ -42,20 +44,23 @@ define(function () {
                   .attr({
                     "x": function (d) { return helpers.getX(d)+4; },
                     "y": function (d) { return helpers.getY(d)-24; },
-                    "rx": 5,
-                    "ry": 5,
-                    width: 80,
+                    "rx": 3,
+                    "ry": 3,
+                    width: 120,
                     height: 18,
                     class: "label"
                   }).style("display", "none");
       that.text = that.node.append("text")
                   .attr({
-                    "x": function (d) { return helpers.getX(d)+6; },
-                    "y": function (d) { return helpers.getY(d)-10; },
+                    "x": function (d) { return helpers.getX(d)+8; },
+                    "y": function (d) { return helpers.getY(d)-11; },
                     width: 100
                   })
-                  .text("id:'"+data.id+"', r:'"+data.routeTag+"'")
+                  .text("id:'"+data.id+"', speed: "+data.speedKmHr+"kph")
                   .style("display", "none");
+      // Increment route counter
+      var n = that.$amt.html() || 0
+      that.$amt.html(parseInt(n, 10)+1);
     };
 
     /**
@@ -86,9 +91,10 @@ define(function () {
         .ease("linear")
         .duration(1000)
         .attr({
-          "x": function (d) { return helpers.getX(d)+6; },
-          "y": function (d) { return helpers.getY(d)-10; }
-        });
+          "x": function (d) { return helpers.getX(d)+8; },
+          "y": function (d) { return helpers.getY(d)-11; }
+        })
+        .text("id:'"+data.id+"', speed: "+data.speedKmHr+"kph");
     };
 
     /**

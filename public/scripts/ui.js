@@ -86,12 +86,18 @@ define(["map"], function (map) {
     var addVehicle = function ($el) {
       var $option = $($el[0].options[$el[0].selectedIndex]);
       map.findVehicles($el[0].value, $option.data("color"));
-      var $icon = $("<span />").addClass("icon").css("backgroundColor", $option.data("color"));
-      var $text = $("<span />").html($option.data("title"));
-      var $li = $("<li />").addClass($el[0].value).append($icon, $text);
+      var $icon   = $("<span />").addClass("icon").css("backgroundColor", $option.data("color"));
+      var $text   = $("<span />").addClass("name").html($option.data("title"));
+      var $amount = $("<span />").addClass("amount badge badge-info").html(0);
+      var $li     = $("<li />").addClass($el[0].value).append($icon, $text, $amount);
       $li.appendTo($list).find(".icon").on("click", function (event) {
-        map.clearRoute($(this).parent().attr("class"));
+        var $el = $(this).parent();
+        map.clearRoute($el.attr("class"), function () {
+          $el.remove();
+          notify("Cleared");
+        });
       });
+      notify("Added");
     };
 
     var notify = function (text) {
