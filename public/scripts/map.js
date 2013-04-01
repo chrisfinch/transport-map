@@ -82,12 +82,12 @@ define(["vehicle"], function (vehicle) {
 
         var g = mapG.append("g").attr("class", data[0].type);
         g.selectAll("path")
-        .data(data[0].data.features)
-        .enter()
-        .append("path")
-        .attr({
-          "d": path
-        });
+          .data(data[0].data.features)
+          .enter()
+          .append("path")
+          .attr({
+            "d": path
+          });
         LAYERS.push(g);
       }
     };
@@ -96,12 +96,19 @@ define(["vehicle"], function (vehicle) {
      * Draw the reference map in the corner with D3
      */
     var drawRefGeoJSON = function (json, urls) {
-      var prj = d3.geo.albers().scale(1).translate([0,0]);
-      var pth = d3.geo.path().projection(prj);
-      var ref = d3.select("#ref").append('svg').append("g").attr("class", "ref");
-
       var w = $("#ref").width();
       var h = $("#ref").height();
+
+      var prj = d3.geo.albers().scale(1).translate([0,0]);
+      var pth = d3.geo.path().projection(prj);
+      var ref = d3.select("#ref")
+                  .append('svg')
+                  .attr({
+                    "width": w,
+                    "height": h
+                  })
+                  .append("g")
+                  .attr("class", "ref");
 
       var sf_data = json.filter(function (e) {
         return e.type === 'sf_basic';
