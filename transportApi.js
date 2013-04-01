@@ -81,7 +81,7 @@ exports.clearRoute = function (routeTag) {
  * @param  {Object} route
  */
 exports.getLocations = function (route) {
-  console.log("transportApi::getLocations::"+route);
+  console.log("transportApi::getLocations::"+route['$'].tag);
   var that = this;
   (function (route) {
     var f = function () {
@@ -122,28 +122,3 @@ exports.getRoutes = function () {
     });
   });
 };
-
-// var apiGetAgencys = function () {
-//   http.get("http://webservices.nextbus.com/service/publicXMLFeed?command=agencyList", function (response) {
-//     response.setEncoding('utf8');
-//     var buffer = "";
-//     response.on("data", function (chunk) {
-//       buffer+=chunk;
-//     });
-//     response.on("end", function () {
-//       xml2js(buffer, function (err, result) {
-//         apiProcessAgencys(result.body.agency);
-//       });
-//     });
-
-//     // var xml = new XmlStream(response);
-//     // xml.on('data', function () {
-//     //   console.log("data", arguments);
-//     // });
-//     // xml.on('end', function () {
-//     //   console.log("end", arguments);
-//     // });
-//   });
-// };
-
-//apiGetAgencys();

@@ -11,14 +11,21 @@ define(["map"], function (map) {
     $labels = $controls.find(".labels");
     $clear = $controls.find(".clear");
     $ctrl_toggle = $(".ctrl-toggle .btn");
+    $layer_toggles = $controls.find(".layer-toggle");
 
+    /**
+     * Kick of the building of the select options for the route select
+     */
     var build = function () {
       socket.emit("findRoutes");
       socket.on("routes", function (routes) {
-        addRoutes(routes);
+        addRouteOptions(routes);
       });
     };
 
+    /**
+     * Bind all browser events to UI controls
+     */
     var bind = function () {
       $ctrl_toggle.on("click", function (event) {
         event.preventDefault();
@@ -31,19 +38,32 @@ define(["map"], function (map) {
       });
       $routes.on("change", function (event) {
         event.preventDefault();
-        addVehicle($(this));
+        addRoute($(this));
       });
       $clear.on("click", function (event) {
         event.preventDefault();
-        map.clearAllVehicles();
+        map.clearAllRoutes();
         socket.on("vehiclesCleared", function () {
           emptyVehicleList();
           notify("Routes cleared");
         });
       });
+      $layer_toggles.on("click", function (event) {
+        event.preventDefault();
+        var $btn = $(this);
+        map.toggleLayer($(this).attr("id"), $btn.is(".disabled"), function (layer, toggle) {
+          if (toggle) $btn.removeClass("disabled");
+          else $btn.addClass("disabled");
+          var adjective = toggle ? "on" : "off";
+          notify(layer+" "+adjective);
+        });
+      });
     };
 
-    var addRoutes = function (routes) {
+    /**
+     * Add routes to the select box and assign colours to them based on HSL hue
+     */
+    var addRouteOptions = function (routes) {
       // Build colors
       var colors = new Array(routes.length);
       for (var j = 0; j < colors.length; j++) {
@@ -62,6 +82,9 @@ define(["map"], function (map) {
       }
     };
 
+    /**
+     * Toggle labels on all vehicles
+     */
     var toggleLabels = function ($el) {
       var routesHash = map.getRoutesHash();
       if ($el.hasClass("on")) {
@@ -83,7 +106,10 @@ define(["map"], function (map) {
       }
     };
 
-    var addVehicle = function ($el) {
+    /**
+     * Add a route to the map along with its indicator list item with colour for the key.
+     */
+    var addRoute = function ($el) {
       var $option = $($el[0].options[$el[0].selectedIndex]);
       map.findVehicles($el[0].value, $option.data("color"));
       var $icon   = $("<span />").addClass("icon").css("backgroundColor", $option.data("color"));
@@ -100,19 +126,28 @@ define(["map"], function (map) {
       notify("Added");
     };
 
+    /**
+     * Throw up a simple notification to let the user know whats happened.
+     */
     var notify = function (text) {
       $notify.html(text).addClass("pop").on("webkitAnimationEnd oanimationend msAnimationEnd animationend", function () {
         $notify.removeClass("pop");
       });
     };
 
+    /**
+     * Helper to empty the list of vehicles on callback form the server
+     */
     var emptyVehicleList = function () {
       $list.empty();
     };
 
     return {
+      /**
+       * Kick of the build and bind functions
+       */
       init: function () {
-        map.clearAllVehicles(); // Clear out old vehicle feeds on the server incase of refresh
+        map.clearAllRoutes(); // Clear out old vehicle feeds on the server incase of refresh
         build();
         bind();
       }

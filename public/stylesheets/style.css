@@ -94,6 +94,11 @@ form.controls .control-group {
   width: 180px;
   margin: 0 0 12px 0;
 }
+form.controls .control-group label {
+  padding: 0 0 2px 0;
+  margin: 0 0 12px 0;
+  border-bottom: 1px solid #dedede;
+}
 form.controls .control-group #routes {
   width: 180px;
 }
@@ -146,6 +151,11 @@ form.controls .control-group .displayedRoutes li:hover .icon:before {
   position: absolute;
   top: 0;
   left: 0;
+}
+form.controls .control-group button.layer-toggle {
+  float: left;
+  clear: left;
+  margin: 0 0 6px 0;
 }
 /* SVG Styles
 ========================================================== */

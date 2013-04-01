@@ -23,21 +23,34 @@
 	</div>
 
 	<form class="controls">
+		
 		<div class="control-group">
 			<button class="labels btn">Toggle Labels</button>
 		</div>
+		
 		<div class="control-group">	
 			<button class="clear btn btn-warning">Clear Routes</button>			
 		</div>
+		
 		<div class="control-group">
 			<label for="routes">Add route:</label>
 			<select name="routes" id="routes">
-				<option value="all">All routes</option>
+				<option value="">Select Route</option>
 			</select>
 		</div>
+		
 		<div class="control-group">
 			<ul class="displayedRoutes"></ul>
 		</div>
+
+		<div class="control-group">
+			<label>Toggle layers</label>
+			<button id="neighborhoods" class="btn btn-info layer-toggle">Neighbourhoods</button>
+			<button id="streets" class="btn btn-info layer-toggle">Streets</button>
+			<button id="arteries" class="btn btn-info layer-toggle">Arteries</button>
+			<button id="freeways" class="btn btn-info layer-toggle">Freeways</button>
+		</div>
+
 	</form>
 
 	<h1 class="notify"></h1>

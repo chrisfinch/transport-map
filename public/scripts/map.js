@@ -4,7 +4,7 @@
 define(["vehicle"], function (vehicle) {
   return (function () {
 
-    var svg, mapG, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {}, PATHS = [], $load = $("#load");
+    var svg, mapG, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {}, LAYERS = [], $load = $("#load");
 
     var width = parseInt($(document).width(), 10),
     height = parseInt($(document).height(), 10),
@@ -60,6 +60,9 @@ define(["vehicle"], function (vehicle) {
       return projection;
     };
 
+    /**
+     * Draw the main map using D3
+     */
     var drawMapGeoJSON = function (json, urls) { // Ensure that SVG layers are drawn in the correct order
       this.mapJSON = json;
       this.mapURLS = urls;
@@ -85,10 +88,13 @@ define(["vehicle"], function (vehicle) {
         .attr({
           "d": path
         });
-        PATHS.push(g);
+        LAYERS.push(g);
       }
     };
 
+    /**
+     * Draw the reference map in the corner with D3
+     */
     var drawRefGeoJSON = function (json, urls) {
       var prj = d3.geo.albers().scale(1).translate([0,0]);
       var pth = d3.geo.path().projection(prj);
@@ -115,6 +121,9 @@ define(["vehicle"], function (vehicle) {
       }
     };
 
+    /**
+     * Plot an individual vehicle on the map notifying the vehicle object to create itself or update itself.
+     */
     var plotVehicle = function (data) {
       vehicles = vehicles || svg.append("g").attr("class", "vehicles");
       var hash = routesHash[data.routeTag] = routesHash[data.routeTag] || {};
@@ -128,6 +137,9 @@ define(["vehicle"], function (vehicle) {
 
     };
 
+    /**
+     * Wait for vehicles to be sent from the server.
+     */
     var awaitVehicles = function () {
       socket.on('vehicle', function (data) {
         plotVehicle(data);
@@ -136,6 +148,9 @@ define(["vehicle"], function (vehicle) {
 
     return {
 
+      /**
+       * Build out the initial variables for the main map based on the container ID
+       */
       build: function (id) {
         svg = d3.select(id).append("svg")
           .attr("width", width)
@@ -147,6 +162,9 @@ define(["vehicle"], function (vehicle) {
         awaitVehicles();
       },
 
+      /**
+       * Redscale the map incase of window resize (slightly buggy..)
+       */
       redraw: function () {
         var w = parseInt($(document).width(), 10);
         var h = parseInt($(document).height(), 10);
@@ -161,10 +179,16 @@ define(["vehicle"], function (vehicle) {
         });
       },
 
+      /**
+       * Access method to provide the current routes to outside modules
+       */
       getRoutesHash: function () {
         return routesHash;
       },
 
+      /**
+       * Clear an individual route from the server and map
+       */
       clearRoute: function (routeTag, callback) {
         socket.emit("clearRoute", {routeTag: routeTag});
         socket.on("routeCleared", function (data) {
@@ -175,7 +199,10 @@ define(["vehicle"], function (vehicle) {
         });
       },
 
-      clearAllVehicles: function () {
+      /**
+       * Clear all routes from the map.
+       */
+      clearAllRoutes: function () {
         socket.emit("clearVehicles");
         socket.on("vehiclesCleared", function () {
           for (var r in routesHash) {
@@ -186,11 +213,26 @@ define(["vehicle"], function (vehicle) {
         });
       },
 
+      /**
+       * Notify the server to start updating vehicles for a route
+       */
       findVehicles: function (routeTag, color) {
         colors[routeTag] = color;
         socket.emit("findVehicles", {routeTag: routeTag});
+      },
+
+      /**
+       * Turn a map layer on or off and execute a callback.
+       */
+      toggleLayer: function (layer, toggle, callback) {
+        var $layer = $(LAYERS.filter(function (e) {
+          return e.attr("class") === layer;
+        })[0][0]);
+        if (toggle) $layer.show();
+        else $layer.hide();
+        if (callback) callback(layer, toggle);
       }
 
-    }; // map
+    };
   })();
 });

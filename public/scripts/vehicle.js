@@ -58,6 +58,7 @@ define(function () {
                   })
                   .text("id:'"+data.id+"', speed: "+data.speedKmHr+"kph")
                   .style("display", "none");
+      
       // Increment route counter
       var n = that.$amt.html() || 0
       that.$amt.html(parseInt(n, 10)+1);
