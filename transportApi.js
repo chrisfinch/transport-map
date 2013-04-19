@@ -103,9 +103,9 @@ exports.getLocations = function (route) {
 exports.processRouteLocations = function (data) {
   var that = this;
   if (data.vehicles.vehicle) {
-    for (var i = 0; i < data.vehicles.vehicle.length; i++) {
-      that.socket.emit("vehicle", data.vehicles.vehicle[i]['$']);
-    }
+
+    that.socket.emit("vehicles", data.vehicles.vehicle);
+
   }
 };
 

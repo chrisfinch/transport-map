@@ -5,9 +5,12 @@ define(function () {
   var vehicle = function (data, parent, projection, color) {
 
     var that = this;
+
+    that.node = d3.select(parent);
+
     that.data = data;
     that.color = color;
-    that.node = null;
+    //that.node = null;
     that.el = null;
     that.$route = $(".displayedRoutes").find("."+data.routeTag);
     that.$amt = that.$route.find(".amount");
@@ -18,10 +21,10 @@ define(function () {
      */
     helpers = {
       getX: function (d) {
-        return projection([d.lon, d.lat])[0];
+        return projection([d["$"].lon, d["$"].lat])[0];
       },
       getY: function (d) {
-        return projection([d.lon, d.lat])[1];
+        return projection([d["$"].lon, d["$"].lat])[1];
       }
     };
 
@@ -29,8 +32,7 @@ define(function () {
      * Create this vehicle on the map with a point for its position and two elements that make up the vehicles label.
      */
     that.create = function () {
-      that.node = parent.append("g")
-                    .datum(data);
+      //that.node.datum(data);
       that.el = that.node.append("circle")
                   .attr({
                     "cx": helpers.getX,

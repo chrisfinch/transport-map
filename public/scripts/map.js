@@ -4,7 +4,7 @@
 define(["vehicle"], function (vehicle) {
   return (function () {
 
-    var svg, mapG, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {}, LAYERS = [], $load = $("#load");
+    var svg, mapG, projection, vehicles, vehiclesMap, path, colors = {}, routesHash = {}, LAYERS = [], $load = $("#load"), currentVehicles;
 
     var width = parseInt($(document).width(), 10),
     height = parseInt($(document).height(), 10),
@@ -131,16 +131,38 @@ define(["vehicle"], function (vehicle) {
     /**
      * Plot an individual vehicle on the map notifying the vehicle object to create itself or update itself.
      */
-    var plotVehicle = function (data) {
-      vehicles = vehicles || svg.append("g").attr("class", "vehicles");
-      var hash = routesHash[data.routeTag] = routesHash[data.routeTag] || {};
-      hash[data.id] = hash[data.id] || new vehicle(data, vehicles, projection, colors[data.routeTag]);
+    var plotVehicles = function (data) {
 
-      if (hash[data.id].el === null) {
-        hash[data.id].create();
-      } else {
-        hash[data.id].update(data);
-      }
+      // Create layer
+      vehicles = vehicles || svg.append("g").attr("class", "vehicles");
+
+      currentVehicles = vehicles.selectAll("g").data(data, function (d, i) {
+        return d["$"]["id"];
+      });
+
+      currentVehicles.each(function (d, i) {
+        this.vehicle.update(d);
+      });
+
+      currentVehicles.enter().append("g").each(function (d, i) {
+        var v = new vehicle(d["$"], this, projection, colors[d["$"].routeTag]);
+        v.create();
+        this.vehicle = v;
+      });
+
+      currentVehicles.exit().each(function (d, i) {
+        this.vehicle.destroy();
+      });
+
+      //var hash = routesHash[data.routeTag] = routesHash[data.routeTag] || {};
+
+      //hash[data.id] = hash[data.id] || 
+
+      // if (hash[data.id].el === null) {
+      //   hash[data.id].create();
+      // } else {
+      //   hash[data.id].update(data);
+      // }
 
     };
 
@@ -148,8 +170,8 @@ define(["vehicle"], function (vehicle) {
      * Wait for vehicles to be sent from the server.
      */
     var awaitVehicles = function () {
-      socket.on('vehicle', function (data) {
-        plotVehicle(data);
+      socket.on('vehicles', function (data) {
+        plotVehicles(data);
       });
     };
 
